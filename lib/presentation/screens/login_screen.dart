@@ -73,6 +73,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                 // ── Logo ──
                 Container(
+                  // ignore: physical-property-detected — Flutter, no CSS
                   width: 80,
                   height: 80,
                   decoration: BoxDecoration(

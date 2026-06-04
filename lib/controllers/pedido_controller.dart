@@ -39,9 +39,9 @@ class PedidoController extends ChangeNotifier {
     _loading = true;
     notifyListeners();
 
-    if (q.isEmpty && _filtroEstado == null) {
+    if (q.isEmpty) {
       _pedidos = await PedidoService.getPedidos();
-    } else if (q.isNotEmpty) {
+    } else {
       _pedidos = await PedidoService.buscar(q);
     }
 

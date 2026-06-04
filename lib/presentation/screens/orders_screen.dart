@@ -74,8 +74,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
             const SizedBox(height: 4),
 
             // ── Section title ──
-            if (controller.filtroEstado == null ||
-                controller.filtroEstado == EstadoPedido.activo)
+            if (controller.filtroEstado == EstadoPedido.activo)
               _SectionHeader(
                 title: "Pedidos Activos",
                 count: controller.pedidosActivos.length,
