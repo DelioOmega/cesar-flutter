@@ -19,6 +19,9 @@ class Pedido {
   final EstadoPedido estado;
   final EstadoProgreso progreso;
   final String fecha;
+  final String? tipoPedido;
+  final String? observacion;
+  final double? precioEstimado;
 
   Pedido({
     required this.id,
@@ -29,6 +32,9 @@ class Pedido {
     required this.estado,
     required this.progreso,
     required this.fecha,
+    this.tipoPedido,
+    this.observacion,
+    this.precioEstimado,
   });
 
   factory Pedido.fromJson(Map<String, dynamic> json) {
@@ -42,6 +48,39 @@ class Pedido {
       progreso: _parseProgreso(json["progreso"]),
       fecha: json["fecha"] ?? "",
     );
+  }
+
+  /// Convierte desde el formato del backend
+  factory Pedido.fromBackend(Map<String, dynamic> json) {
+    final estadoRaw = json["pedEstFk"]?.toString() ?? "";
+    return Pedido(
+      id: json["pedId"]?.toString() ?? "",
+      numeroOrden: json["pedId"]?.toString() ?? "",
+      clienteId: json["pedCliIdFk"]?.toString() ?? "",
+      clienteNombre: "", // Se rellena desde el controller con join local
+      descripcionProducto: json["pedObs"] ?? "",
+      estado: _parseEstadoBackend(estadoRaw),
+      progreso: EstadoProgreso.enProgreso,
+      fecha: json["pedFecIng"]?.toString() ?? "",
+      tipoPedido: json["pedTipPedFk"]?.toString(),
+      observacion: json["pedObs"],
+      precioEstimado: json["pedTolEst"] != null
+          ? double.tryParse(json["pedTolEst"].toString())
+          : null,
+    );
+  }
+
+  static EstadoPedido _parseEstadoBackend(String s) {
+    // Estados típicos de la BD: activo, completado, borrador, cancelado
+    switch (s.toLowerCase()) {
+      case "completado":
+      case "entregado":
+        return EstadoPedido.completado;
+      case "borrador":
+        return EstadoPedido.borrador;
+      default:
+        return EstadoPedido.activo;
+    }
   }
 
   static EstadoPedido _parseEstado(String? s) {

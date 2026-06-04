@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart';
 import '../core/services/pedido_service.dart';
+import '../core/services/cliente_service.dart';
 import '../data/model/pedido.dart';
+import '../data/model/cliente.dart';
 
 class PedidoController extends ChangeNotifier {
   List<Pedido> _pedidos = [];
@@ -23,7 +25,37 @@ class PedidoController extends ChangeNotifier {
     notifyListeners();
 
     try {
-      _pedidos = await PedidoService.getPedidos();
+      // Cargar pedidos y clientes en paralelo para hacer join local
+      final resultados = await Future.wait([
+        PedidoService.getPedidos(),
+        ClienteService.getClientes(),
+      ]);
+      final pedidosRaw = resultados[0] as List<Pedido>;
+      final clientes =
+          (resultados[1] as List).cast<Cliente>();
+
+      // Join local: rellenar clienteNombre desde el id
+      final mapaClientes = {
+        for (final c in clientes) c.id: c.nombreCompleto,
+      };
+
+      _pedidos = pedidosRaw.map((p) {
+        final nombreCliente = mapaClientes[p.clienteId] ?? "Cliente ${p.clienteId}";
+        return Pedido(
+          id: p.id,
+          numeroOrden: p.numeroOrden,
+          clienteId: p.clienteId,
+          clienteNombre: nombreCliente,
+          descripcionProducto: p.descripcionProducto,
+          estado: p.estado,
+          progreso: p.progreso,
+          fecha: p.fecha,
+          tipoPedido: p.tipoPedido,
+          observacion: p.observacion,
+          precioEstimado: p.precioEstimado,
+        );
+      }).toList();
+
       _aplicarFiltros();
       _error = null;
     } catch (e) {
@@ -40,12 +72,12 @@ class PedidoController extends ChangeNotifier {
     notifyListeners();
 
     if (q.isEmpty) {
-      _pedidos = await PedidoService.getPedidos();
+      await cargarPedidos();
     } else {
       _pedidos = await PedidoService.buscar(q);
+      _aplicarFiltros();
     }
 
-    _aplicarFiltros();
     _loading = false;
     notifyListeners();
   }

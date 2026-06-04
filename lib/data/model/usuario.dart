@@ -1,29 +1,46 @@
 class Usuario {
+  final String id;
   final String nombre;
-  final String rol;
+  final String apellido;
   final String email;
-  final String? avatar;
+  final String rol;
+  final String? telefono;
 
   Usuario({
+    required this.id,
     required this.nombre,
-    required this.rol,
+    required this.apellido,
     required this.email,
-    this.avatar,
+    required this.rol,
+    this.telefono,
   });
 
-  factory Usuario.fromJson(Map<String, dynamic> json) {
+  String get nombreCompleto => '$nombre $apellido';
+
+  factory Usuario.fromBackend(Map<String, dynamic> json) {
+    final rolRaw = json["usuRol"];
+    final rolStr = rolRaw == 1
+        ? "Atelier Manager"
+        : rolRaw == 2
+            ? "Costurera"
+            : "Desconocido";
+
     return Usuario(
-      nombre: json["nombre"] ?? "",
-      rol: json["rol"] ?? "",
-      email: json["email"] ?? "",
-      avatar: json["avatar"],
+      id: json["usuId"]?.toString() ?? "",
+      nombre: json["usuNom"] ?? "",
+      apellido: json["usuApe"] ?? "",
+      email: json["usuCor"] ?? "",
+      rol: rolStr,
+      telefono: json["usuTel"]?.toString(),
     );
   }
 
   Map<String, dynamic> toJson() => {
-        "nombre": nombre,
-        "rol": rol,
-        "email": email,
-        "avatar": avatar,
+        "usuId": id,
+        "usuNom": nombre,
+        "usuApe": apellido,
+        "usuCor": email,
+        "usuTel": telefono,
+        "usuRol": rol == "Atelier Manager" ? 1 : 2,
       };
 }

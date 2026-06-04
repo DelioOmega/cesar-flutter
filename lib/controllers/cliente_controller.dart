@@ -48,8 +48,8 @@ class ClienteController extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<String> registrar(Map<String, dynamic> data) async {
-    final resp = await ClienteService.registrar(data);
+  Future<String> registrar(Map<String, dynamic> data, String usuIdFk) async {
+    final resp = await ClienteService.registrar(data, usuIdFk);
     await cargarClientes();
     return resp;
   }

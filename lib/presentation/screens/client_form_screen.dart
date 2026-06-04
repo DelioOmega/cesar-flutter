@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../controllers/auth_controller.dart';
 import '../../controllers/cliente_controller.dart';
 import '../../core/theme/app_theme.dart';
 import '../../data/model/cliente.dart';
@@ -54,11 +55,14 @@ class _ClientFormScreenState extends State<ClientFormScreen> {
     };
 
     final controller = context.read<ClienteController>();
+    final auth = context.read<AuthController>();
+    final usuIdFk = auth.usuario?.id ?? "0";
+
     String resp;
     if (_isEditing) {
       resp = await controller.editar(data);
     } else {
-      resp = await controller.registrar(data);
+      resp = await controller.registrar(data, usuIdFk);
     }
 
     if (!mounted) return;
