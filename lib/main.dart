@@ -1,19 +1,33 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'controllers/auth_controller.dart';
+import 'controllers/cliente_controller.dart';
+import 'controllers/pedido_controller.dart';
+import 'core/theme/app_theme.dart';
 import 'routes/app_routes.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const OnaNelApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class OnaNelApp extends StatelessWidget {
+  const OnaNelApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      initialRoute: AppRoutes.home,
-      routes: AppRoutes.routes,
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => AuthController()),
+        ChangeNotifierProvider(create: (_) => ClienteController()),
+        ChangeNotifierProvider(create: (_) => PedidoController()),
+      ],
+      child: MaterialApp(
+        title: "ona&nel - Taller de Costura",
+        debugShowCheckedModeBanner: false,
+        theme: AppTheme.theme,
+        initialRoute: AppRoutes.login,
+        routes: AppRoutes.routes,
+      ),
     );
   }
 }

@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
-import '../presentation/screens/principal_screen.dart';
-import '../presentation/screens/registro_screen.dart';
- 
+import '../presentation/screens/login_screen.dart';
+import '../presentation/screens/home_screen.dart';
 
 class AppRoutes {
-  static const home = '/';
-  static const registro = '/registro';
+  static const String login = '/login';
+  static const String home = '/home';
 
-  static Map<String, WidgetBuilder> routes = {
-    home: (_) => const PrincipalScreen(),
-    registro: (_) => const RegistroScreen(),
-  };
+  static Map<String, WidgetBuilder> get routes => {
+        login: (_) => const LoginScreen(),
+        home: (_) => const HomeScreen(),
+      };
 }
-// static , no es es necesario crear un objeto para acceder a esos recursos
