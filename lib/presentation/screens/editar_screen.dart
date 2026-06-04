@@ -42,9 +42,9 @@ class _EditarScreenState extends State<EditarScreen> {
     try {
       final resp = await UsuarioService.editar({
         'USU_ID': widget.user.id.toString(),
-        'USU_NOMBRES': cNombre.text,
-        'USU_APELLIDOS': cApellido.text,
-        'USU_CORREO': cCorreo.text,
+        'USU_NOMBRES': cNombre.text.trim(),
+        'USU_APELLIDOS': cApellido.text.trim(),
+        'USU_CORREO': cCorreo.text.trim(),
         'USU_ROL': rol,
         'USU_GENERO': genero,
         'USU_PASSWORD': cPassword.text,
@@ -62,10 +62,16 @@ class _EditarScreenState extends State<EditarScreen> {
   void eliminar() async {
     setState(() => loading = true);
 
-    await UsuarioService.eliminar(widget.user.id);
-
-    Navigator.of(context)
-        .pushNamedAndRemoveUntil('/', (route) => false);
+    try {
+      await UsuarioService.eliminar(widget.user.id);
+      if (!mounted) return;
+      Navigator.of(context)
+          .pushNamedAndRemoveUntil('/', (route) => false);
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => loading = false);
+      mostrarMensaje("Error al eliminar");
+    }
   }
 
   void mostrarMensaje(String msg) {
@@ -85,6 +91,15 @@ class _EditarScreenState extends State<EditarScreen> {
         ],
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    cNombre.dispose();
+    cApellido.dispose();
+    cCorreo.dispose();
+    cPassword.dispose();
+    super.dispose();
   }
 
   @override

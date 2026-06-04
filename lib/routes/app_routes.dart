@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../presentation/screens/PrincipalScreen.dart';
+import '../presentation/screens/principal_screen.dart';
 import '../presentation/screens/registro_screen.dart';
  
 

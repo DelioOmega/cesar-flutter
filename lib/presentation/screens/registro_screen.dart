@@ -61,6 +61,15 @@ class _RegistroScreenState extends State<RegistroScreen> {
   }
 
   @override
+  void dispose() {
+    cNombre.dispose();
+    cApellido.dispose();
+    cCorreo.dispose();
+    cPassword.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("Registrar Usuario")),

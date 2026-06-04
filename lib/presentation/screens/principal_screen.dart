@@ -1,6 +1,6 @@
-import 'package:crud_mysql/presentation/screens/editar_screen.dart';
 import 'package:flutter/material.dart';
- 
+
+import 'editar_screen.dart';
 import '../../core/services/usuario_service.dart';
 import '../../data/model/usuario.dart';
 
@@ -52,12 +52,13 @@ class _PrincipalScreenState extends State<PrincipalScreen> {
               return ListTile(
                 title: Text(u.nombres),
                 subtitle: Text(u.correo),
-                onTap: () {
-                   Navigator.push(
+                onTap: () async {
+                   await Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) => EditarScreen(user: u),
                           ));
+                   recargar();
                 },
                 onLongPress: () async {
                   await UsuarioService.eliminar(u.id);
