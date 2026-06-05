@@ -33,12 +33,19 @@ class PedidoService {
 
     final body = {
       "id": id,
-      "id_cliente": data["clienteId"]?.toString() ?? "",
-      "tipo_pedido": data["tipoPedido"] ?? "PERSONALIZADO",
-      "observacion": data["descripcionProducto"] ?? "",
+      "id_cliente": data["id_cliente"]?.toString() ?? "",
+      "tipo_pedido": data["tipo_pedido"]?.toString() ?? "",
+      if (data["fecha_estimada"] != null && data["fecha_estimada"].toString().isNotEmpty)
+        "fecha_estimada": data["fecha_estimada"].toString(),
+      if (data["dias_recordatorio"] != null)
+        "dias_recordatorio": data["dias_recordatorio"],
+      if (data["precio_total_estimado"] != null)
+        "precio_total_estimado": data["precio_total_estimado"],
+      if (data["observacion"] != null && data["observacion"].toString().isNotEmpty)
+        "observacion": data["observacion"].toString(),
     };
 
-    final resp = await ApiClient.post('/pedidos/', body);
+    final resp = await ApiClient.post('/pedidos', body);
     if (resp != null) {
       if (resp["message"] != null) return resp["message"];
       if (resp["mensaje"] != null) return resp["mensaje"];

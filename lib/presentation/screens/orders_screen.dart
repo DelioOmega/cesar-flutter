@@ -5,6 +5,7 @@ import '../../core/theme/app_theme.dart';
 import '../../data/model/pedido.dart';
 import '../widgets/order_card.dart';
 import '../widgets/search_bar_widget.dart';
+import 'order_form_screen.dart';
 
 class OrdersScreen extends StatefulWidget {
   const OrdersScreen({super.key});
@@ -126,8 +127,11 @@ class _OrdersScreenState extends State<OrdersScreen> {
           right: 20,
           child: FloatingActionButton(
             onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text("Nuevo pedido — próximamente")),
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const OrderFormScreen(),
+                ),
               );
             },
             child: const Icon(Icons.add),
