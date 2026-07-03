@@ -1,7 +1,8 @@
 enum EstadoPedido {
-  activo,
-  completado,
-  borrador,
+  pendiente,
+  enProceso,
+  terminado,
+  cancelado,
 }
 
 enum EstadoProgreso {
@@ -71,26 +72,38 @@ class Pedido {
   }
 
   static EstadoPedido _parseEstadoBackend(String s) {
-    // Estados típicos de la BD: activo, completado, borrador, cancelado
-    switch (s.toLowerCase()) {
-      case "completado":
-      case "entregado":
-        return EstadoPedido.completado;
-      case "borrador":
-        return EstadoPedido.borrador;
+    switch (s.toUpperCase()) {
+      case "PENDIENTE":
+        return EstadoPedido.pendiente;
+      case "EN PROCESO":
+      case "EN_PROCESO":
+        return EstadoPedido.enProceso;
+      case "TERMINADO":
+      case "ENTREGADO":
+      case "COMPLETADO":
+        return EstadoPedido.terminado;
+      case "CANCELADO":
+        return EstadoPedido.cancelado;
       default:
-        return EstadoPedido.activo;
+        return EstadoPedido.pendiente;
     }
   }
 
   static EstadoPedido _parseEstado(String? s) {
-    switch (s) {
-      case "completado":
-        return EstadoPedido.completado;
-      case "borrador":
-        return EstadoPedido.borrador;
+    switch (s?.toUpperCase()) {
+      case "PENDIENTE":
+        return EstadoPedido.pendiente;
+      case "EN PROCESO":
+      case "EN_PROCESO":
+        return EstadoPedido.enProceso;
+      case "TERMINADO":
+      case "ENTREGADO":
+      case "COMPLETADO":
+        return EstadoPedido.terminado;
+      case "CANCELADO":
+        return EstadoPedido.cancelado;
       default:
-        return EstadoPedido.activo;
+        return EstadoPedido.pendiente;
     }
   }
 

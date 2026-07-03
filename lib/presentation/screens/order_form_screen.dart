@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../controllers/cliente_controller.dart';
 import '../../controllers/pedido_controller.dart';
+import '../../core/services/cliente_service.dart';
 import '../../core/theme/app_theme.dart';
 import '../../data/model/cliente.dart';
 
@@ -16,7 +16,7 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
   final _formKey = GlobalKey<FormState>();
 
   String? _clienteId;
-  final _tipoPedidoCtrl = TextEditingController();
+  String? _tipoPedido;
   final _fechaEstimadaCtrl = TextEditingController();
   final _diasRecordatorioCtrl = TextEditingController();
   final _precioEstimadoCtrl = TextEditingController();
@@ -29,15 +29,13 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
   @override
   void initState() {
     super.initState();
-    _cargarClientes();
+    // Cargar clientes después del primer frame para no interferir con el build
+    WidgetsBinding.instance.addPostFrameCallback((_) => _cargarClientes());
   }
 
   Future<void> _cargarClientes() async {
-    setState(() => _cargandoClientes = true);
     try {
-      final controller = context.read<ClienteController>();
-      await controller.cargarClientes();
-      _clientes = controller.clientes;
+      _clientes = await ClienteService.getClientes();
     } catch (_) {
       _clientes = [];
     }
@@ -50,7 +48,7 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
       initialDate: DateTime.now().add(const Duration(days: 7)),
       firstDate: DateTime.now(),
       lastDate: DateTime.now().add(const Duration(days: 365)),
-      locale: const Locale("es", "ES"),
+
     );
     if (picked != null) {
       _fechaEstimadaCtrl.text =
@@ -71,7 +69,7 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
 
     final data = <String, dynamic>{
       "id_cliente": _clienteId,
-      "tipo_pedido": _tipoPedidoCtrl.text.trim(),
+      "tipo_pedido": _tipoPedido,
     };
 
     if (_fechaEstimadaCtrl.text.isNotEmpty) {
@@ -101,7 +99,6 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
 
   @override
   void dispose() {
-    _tipoPedidoCtrl.dispose();
     _fechaEstimadaCtrl.dispose();
     _diasRecordatorioCtrl.dispose();
     _precioEstimadoCtrl.dispose();
@@ -157,15 +154,38 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                     ),
               const SizedBox(height: 18),
 
-              // ── Tipo de pedido ──
-              TextFormField(
-                controller: _tipoPedidoCtrl,
-                decoration: const InputDecoration(
-                  labelText: "Tipo de pedido",
-                  hintText: "Ej: Vestido, Camisa, etc.",
+              // ── Tipo de pedido (select) ──
+              const Text(
+                "Tipo de pedido",
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.textDark,
                 ),
+              ),
+              const SizedBox(height: 6),
+              DropdownButtonFormField<String>(
+                value: _tipoPedido,
+                isExpanded: true,
+                decoration: const InputDecoration(
+                  hintText: "Seleccionar tipo",
+                ),
+                items: const [
+                  DropdownMenuItem(
+                    value: "PERSONALIZADO",
+                    child: Text("Personalizado"),
+                  ),
+                  DropdownMenuItem(
+                    value: "RETOQUES",
+                    child: Text("Retoques"),
+                  ),
+                  DropdownMenuItem(
+                    value: "MODIFICACIONES",
+                    child: Text("Modificaciones"),
+                  ),
+                ],
+                onChanged: (v) => setState(() => _tipoPedido = v),
                 validator: (v) =>
-                    (v == null || v.trim().isEmpty) ? "Campo requerido" : null,
+                    v == null ? "Selecciona un tipo de pedido" : null,
               ),
               const SizedBox(height: 14),
 

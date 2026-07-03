@@ -14,7 +14,7 @@ class PedidoController extends ChangeNotifier {
 
   List<Pedido> get pedidos => _pedidosFiltrados;
   List<Pedido> get pedidosActivos =>
-      _pedidosFiltrados.where((p) => p.estado == EstadoPedido.activo).toList();
+      _pedidosFiltrados.where((p) => p.estado == EstadoPedido.enProceso).toList();
   bool get loading => _loading;
   String? get error => _error;
   String get query => _query;

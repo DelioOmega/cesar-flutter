@@ -49,24 +49,32 @@ class _OrdersScreenState extends State<OrdersScreen> {
                     onTap: () => controller.setFiltroEstado(null),
                   ),
                   _FilterChip(
-                    label: "Activos",
-                    isSelected: controller.filtroEstado == EstadoPedido.activo,
+                    label: "Pendientes",
+                    isSelected:
+                        controller.filtroEstado == EstadoPedido.pendiente,
                     onTap: () =>
-                        controller.setFiltroEstado(EstadoPedido.activo),
+                        controller.setFiltroEstado(EstadoPedido.pendiente),
                   ),
                   _FilterChip(
-                    label: "Completados",
+                    label: "En Proceso",
                     isSelected:
-                        controller.filtroEstado == EstadoPedido.completado,
+                        controller.filtroEstado == EstadoPedido.enProceso,
                     onTap: () =>
-                        controller.setFiltroEstado(EstadoPedido.completado),
+                        controller.setFiltroEstado(EstadoPedido.enProceso),
                   ),
                   _FilterChip(
-                    label: "Borradores",
+                    label: "Terminados",
                     isSelected:
-                        controller.filtroEstado == EstadoPedido.borrador,
+                        controller.filtroEstado == EstadoPedido.terminado,
                     onTap: () =>
-                        controller.setFiltroEstado(EstadoPedido.borrador),
+                        controller.setFiltroEstado(EstadoPedido.terminado),
+                  ),
+                  _FilterChip(
+                    label: "Cancelados",
+                    isSelected:
+                        controller.filtroEstado == EstadoPedido.cancelado,
+                    onTap: () =>
+                        controller.setFiltroEstado(EstadoPedido.cancelado),
                   ),
                 ],
               ),
@@ -75,9 +83,9 @@ class _OrdersScreenState extends State<OrdersScreen> {
             const SizedBox(height: 4),
 
             // ── Section title ──
-            if (controller.filtroEstado == EstadoPedido.activo)
+            if (controller.filtroEstado == EstadoPedido.enProceso)
               _SectionHeader(
-                title: "Pedidos Activos",
+                title: "En Proceso",
                 count: controller.pedidosActivos.length,
               ),
 
@@ -126,6 +134,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
           bottom: 20,
           right: 20,
           child: FloatingActionButton(
+            heroTag: null,
             onPressed: () {
               Navigator.push(
                 context,

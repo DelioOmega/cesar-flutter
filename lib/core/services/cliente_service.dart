@@ -23,13 +23,13 @@ class ClienteService {
       Map<String, dynamic> data, String usuIdFk) async {
     // Generar un id numérico basado en timestamp
     final id = DateTime.now().millisecondsSinceEpoch;
-
     final body = {
       "cliId": id,
       "cliNom": data["nombre"] ?? "",
       "cliApe": data["apellido"] ?? "",
       "cliTel": data["telefono"] ?? "",
       "usuIdFk": int.tryParse(usuIdFk) ?? 0,
+      "cliCorr": data["email"] ?? "",
     };
 
     final resp = await ApiClient.post('/clientes/', body);

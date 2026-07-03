@@ -50,7 +50,7 @@ class ClientCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             const Text(
-              "LAST ORDER",
+              "Fecha de registro",
               style: TextStyle(
                 fontSize: 10,
                 fontWeight: FontWeight.w600,

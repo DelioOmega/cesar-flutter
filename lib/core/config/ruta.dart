@@ -1,3 +1,3 @@
 class Ruta {
-  static const String baseUrl = "http://10.2.129.81:4000";
+  static const String baseUrl = "http://192.168.18.65:4000";
 }

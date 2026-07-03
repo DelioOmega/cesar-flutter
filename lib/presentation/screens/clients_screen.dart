@@ -95,6 +95,7 @@ class _ClientsScreenState extends State<ClientsScreen> {
           bottom: 20,
           right: 20,
           child: FloatingActionButton(
+            heroTag: null,
             onPressed: () async {
               await Navigator.push(
                 context,

@@ -35,7 +35,7 @@ class OrderCard extends StatelessWidget {
                     color: AppTheme.textDark,
                   ),
                 ),
-                _buildBadge(pedido.progreso),
+                _buildBadge(pedido.estado),
               ],
             ),
 
@@ -69,22 +69,26 @@ class OrderCard extends StatelessWidget {
     );
   }
 
-  Widget _buildBadge(EstadoProgreso progreso) {
-    Color color;
-    String label;
+  Widget _buildBadge(EstadoPedido estado) {
+    Color color = AppTheme.textGrey;
+    String label = "—";
 
-    switch (progreso) {
-      case EstadoProgreso.enProgreso:
-        color = AppTheme.blueStatus;
-        label = "IN PROGRESS";
-        break;
-      case EstadoProgreso.controlCalidad:
+    switch (estado) {
+      case EstadoPedido.pendiente:
         color = AppTheme.orangeStatus;
-        label = "QC";
+        label = "PENDIENTE";
         break;
-      case EstadoProgreso.entregado:
+      case EstadoPedido.enProceso:
+        color = AppTheme.blueStatus;
+        label = "EN PROCESO";
+        break;
+      case EstadoPedido.terminado:
         color = AppTheme.greenStatus;
-        label = "DELIVERED";
+        label = "TERMINADO";
+        break;
+      case EstadoPedido.cancelado:
+        color = AppTheme.textGrey;
+        label = "CANCELADO";
         break;
     }
 

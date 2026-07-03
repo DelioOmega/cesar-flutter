@@ -1,11 +1,92 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../controllers/auth_controller.dart';
+import '../../core/services/cliente_service.dart';
+import '../../core/services/pedido_service.dart';
 import '../../core/theme/app_theme.dart';
+import '../../data/model/pedido.dart';
+import '../../data/model/cliente.dart';
 
-class DashboardScreen extends StatelessWidget {
+class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
 
   @override
+  State<DashboardScreen> createState() => _DashboardScreenState();
+}
+
+class _DashboardScreenState extends State<DashboardScreen> {
+  List<Pedido> _todos = [];
+  List<Pedido> _recentes = [];
+  List<Cliente> _clientes = [];
+  bool _loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _cargarDatos());
+  }
+
+  Future<void> _cargarDatos() async {
+    try {
+      final results = await Future.wait([
+        PedidoService.getPedidos(),
+        ClienteService.getClientes(),
+      ]);
+      _todos = results[0] as List<Pedido>;
+      _clientes = results[1] as List<Cliente>;
+
+      final mapaClientes = {
+        for (final c in _clientes) c.id: c.nombreCompleto,
+      };
+
+      // Ordenar por fecha más reciente
+      _todos.sort((a, b) {
+        final fa = _parseFecha(a.fecha);
+        final fb = _parseFecha(b.fecha);
+        return fb.compareTo(fa);
+      });
+
+      // Rellenar nombre de cliente y tomar 3
+      _recentes = _todos.take(3).map((p) {
+        final nombreCliente = mapaClientes[p.clienteId] ?? "Cliente ${p.clienteId}";
+        return Pedido(
+          id: p.id,
+          numeroOrden: p.numeroOrden,
+          clienteId: p.clienteId,
+          clienteNombre: nombreCliente,
+          descripcionProducto: p.descripcionProducto,
+          estado: p.estado,
+          progreso: p.progreso,
+          fecha: p.fecha,
+          tipoPedido: p.tipoPedido,
+          observacion: p.observacion,
+          precioEstimado: p.precioEstimado,
+        );
+      }).toList();
+    } catch (_) {
+      _todos = [];
+      _recentes = [];
+    }
+    if (mounted) setState(() => _loading = false);
+  }
+
+  DateTime _parseFecha(String fecha) {
+    try {
+      return DateTime.parse(fecha);
+    } catch (_) {
+      return DateTime(2000);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final auth = context.watch<AuthController>();
+    final nombre = auth.usuario?.nombre ?? "Usuario";
+
+    // Contar estados del total de pedidos
+    final enProceso = _todos.where((p) => p.estado == EstadoPedido.enProceso).length;
+    final terminados = _todos.where((p) => p.estado == EstadoPedido.terminado).length;
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
       child: Column(
@@ -13,16 +94,16 @@ class DashboardScreen extends StatelessWidget {
         children: [
           // ── Welcome ──
           const Text(
-            "Bienvenida,",
+            "Bienvenido,",
             style: TextStyle(
               fontSize: 14,
               color: AppTheme.textGrey,
             ),
           ),
           const SizedBox(height: 2),
-          const Text(
-            "Elena",
-            style: TextStyle(
+          Text(
+            nombre,
+            style: const TextStyle(
               fontSize: 26,
               fontWeight: FontWeight.w700,
               color: AppTheme.textDark,
@@ -37,14 +118,14 @@ class DashboardScreen extends StatelessWidget {
               _StatCard(
                 icon: Icons.people_outline,
                 label: "Clientes",
-                value: "8",
+                value: "${_clientes.length}",
                 color: AppTheme.accent,
               ),
               const SizedBox(width: 12),
               _StatCard(
                 icon: Icons.receipt_long_outlined,
                 label: "Pedidos activos",
-                value: "3",
+                value: "$enProceso",
                 color: AppTheme.blueStatus,
               ),
             ],
@@ -56,15 +137,15 @@ class DashboardScreen extends StatelessWidget {
             children: [
               _StatCard(
                 icon: Icons.check_circle_outline,
-                label: "Completados",
-                value: "2",
+                label: "Terminados",
+                value: "$terminados",
                 color: AppTheme.greenStatus,
               ),
               const SizedBox(width: 12),
               _StatCard(
                 icon: Icons.edit_note,
-                label: "Borradores",
-                value: "2",
+                label: "Total pedidos",
+                value: "${_todos.length}",
                 color: AppTheme.orangeStatus,
               ),
             ],
@@ -72,7 +153,7 @@ class DashboardScreen extends StatelessWidget {
 
           const SizedBox(height: 32),
 
-          // ── Upcoming section ──
+          // ── Recent orders section ──
           const Text(
             "PEDIDOS RECIENTES",
             style: TextStyle(
@@ -84,21 +165,31 @@ class DashboardScreen extends StatelessWidget {
           ),
           const SizedBox(height: 12),
 
-          _RecentOrder(
-            orderNumber: "ORD-1042",
-            client: "María González",
-            product: "Vestido de novia — encaje floral",
-          ),
-          _RecentOrder(
-            orderNumber: "ORD-1041",
-            client: "Carmen López",
-            product: "Traje chaqueta entallado — lana fría",
-          ),
-          _RecentOrder(
-            orderNumber: "ORD-1040",
-            client: "Isabel Martínez",
-            product: "Blusa de seda — cuello lazo",
-          ),
+          if (_loading)
+            const Center(
+              child: Padding(
+                padding: EdgeInsets.all(20),
+                child: CircularProgressIndicator(),
+              ),
+            )
+          else if (_recentes.isEmpty)
+            const Padding(
+              padding: EdgeInsets.only(top: 20),
+              child: Center(
+                child: Text(
+                  "No hay pedidos recientes",
+                  style: TextStyle(color: AppTheme.textGrey),
+                ),
+              ),
+            )
+          else
+            ..._recentes.map((p) => _RecentOrder(
+              orderNumber: p.numeroOrden,
+              client: p.clienteNombre,
+              product: p.tipoPedido != null
+                  ? "${p.tipoPedido} — ${p.descripcionProducto}"
+                  : p.descripcionProducto,
+            )),
         ],
       ),
     );

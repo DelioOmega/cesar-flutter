@@ -44,6 +44,7 @@ class PedidoService {
       if (data["observacion"] != null && data["observacion"].toString().isNotEmpty)
         "observacion": data["observacion"].toString(),
     };
+    print(body);
 
     final resp = await ApiClient.post('/pedidos', body);
     if (resp != null) {
