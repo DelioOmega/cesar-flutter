@@ -27,10 +27,8 @@ class _ClientFormScreenState extends State<ClientFormScreen> {
   void initState() {
     super.initState();
     _nombreCtrl = TextEditingController(text: widget.cliente?.nombre ?? "");
-    _apellidoCtrl =
-        TextEditingController(text: widget.cliente?.apellido ?? "");
-    _telefonoCtrl =
-        TextEditingController(text: widget.cliente?.telefono ?? "");
+    _apellidoCtrl = TextEditingController(text: widget.cliente?.apellido ?? "");
+    _telefonoCtrl = TextEditingController(text: widget.cliente?.telefono ?? "");
     _emailCtrl = TextEditingController(text: widget.cliente?.email ?? "");
   }
 
@@ -45,7 +43,13 @@ class _ClientFormScreenState extends State<ClientFormScreen> {
 
   Future<void> _guardar() async {
     setState(() => _loading = true);
-
+    if (_nombreCtrl.text.trim().isEmpty) {
+      setState(() => _loading = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('El nombre es requerido')),
+      );
+      return;
+    }
     final data = {
       if (_isEditing) "id": widget.cliente!.id,
       "nombre": _nombreCtrl.text.trim(),
@@ -68,9 +72,7 @@ class _ClientFormScreenState extends State<ClientFormScreen> {
     if (!mounted) return;
     setState(() => _loading = false);
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(resp)),
-    );
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(resp)));
     Navigator.pop(context);
   }
 
@@ -84,7 +86,7 @@ class _ClientFormScreenState extends State<ClientFormScreen> {
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
-            // ── Avatar placeholder ──
+            // Avatar
             Center(
               child: Stack(
                 children: [
@@ -102,19 +104,19 @@ class _ClientFormScreenState extends State<ClientFormScreen> {
                       ),
                     ),
                   ),
-                  Positioned(
-                    bottom: 0,
-                    right: 0,
-                    child: Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: const BoxDecoration(
-                        color: AppTheme.accent,
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(Icons.camera_alt,
-                          size: 16, color: Colors.white),
-                    ),
-                  ),
+                  // Positioned(
+                  //   bottom: 0,
+                  //   right: 0,
+                  //   child: Container(
+                  //     padding: const EdgeInsets.all(4),
+                  //     decoration: const BoxDecoration(
+                  //       color: AppTheme.accent,
+                  //       shape: BoxShape.circle,
+                  //     ),
+                  //     child: const Icon(Icons.camera_alt,
+                  //         size: 16, color: Colors.white),
+                  //   ),
+                  // ),
                 ],
               ),
             ),
@@ -140,7 +142,9 @@ class _ClientFormScreenState extends State<ClientFormScreen> {
             TextField(
               controller: _emailCtrl,
               keyboardType: TextInputType.emailAddress,
-              decoration: const InputDecoration(labelText: "Correo electrónico"),
+              decoration: const InputDecoration(
+                labelText: "Correo electrónico",
+              ),
             ),
 
             const SizedBox(height: 32),
@@ -159,7 +163,9 @@ class _ClientFormScreenState extends State<ClientFormScreen> {
                           color: Colors.white,
                         ),
                       )
-                    : Text(_isEditing ? "Guardar Cambios" : "Registrar Cliente"),
+                    : Text(
+                        _isEditing ? "Guardar Cambios" : "Registrar Cliente",
+                      ),
               ),
             ),
           ],

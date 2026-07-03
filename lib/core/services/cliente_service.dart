@@ -1,7 +1,9 @@
 import '../../data/model/cliente.dart';
 import 'api_client.dart';
 
+// Servicio de clientes. CRUD contra el backend via ApiClient.
 class ClienteService {
+  // GET /clientes/ → devuelve la lista de clientes.
   static Future<List<Cliente>> getClientes() async {
     final data = await ApiClient.get('/clientes/');
     if (data == null || data is! List) return [];
@@ -10,6 +12,7 @@ class ClienteService {
         .toList();
   }
 
+  // Busca clientes por nombre (filtro local, no llama al backend).
   static Future<List<Cliente>> buscar(String query) async {
     final clientes = await getClientes();
     if (query.isEmpty) return clientes;
@@ -19,9 +22,9 @@ class ClienteService {
         .toList();
   }
 
+  // POST /clientes/ → registra un nuevo cliente.
   static Future<String> registrar(
       Map<String, dynamic> data, String usuIdFk) async {
-    // Generar un id numérico basado en timestamp
     final id = DateTime.now().millisecondsSinceEpoch;
     final body = {
       "cliId": id,
@@ -39,13 +42,13 @@ class ClienteService {
     return "Error al registrar cliente";
   }
 
+  //  PUT /clientes/ — no implementado en el backend.
   static Future<String> editar(Map<String, dynamic> data) async {
-    // El backend actual no tiene PUT /clientes/
     return "Funcionalidad no disponible en el servidor";
   }
 
+  // DELETE /clientes/ — no implementado en el backend.
   static Future<String> eliminar(String id) async {
-    // El backend actual no tiene DELETE /clientes/
     return "Funcionalidad no disponible en el servidor";
   }
 }

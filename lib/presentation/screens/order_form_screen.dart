@@ -45,7 +45,7 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
   Future<void> _seleccionarFecha() async {
     final picked = await showDatePicker(
       context: context,
-      initialDate: DateTime.now().add(const Duration(days: 7)),
+      initialDate: DateTime.now(),
       firstDate: DateTime.now(),
       lastDate: DateTime.now().add(const Duration(days: 365)),
 
@@ -218,7 +218,7 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                     const TextInputType.numberWithOptions(decimal: true),
                 decoration: const InputDecoration(
                   labelText: "Precio total estimado (opcional)",
-                  prefixText: "S/ ",
+                  prefixText: "\$ ",
                 ),
               ),
               const SizedBox(height: 14),

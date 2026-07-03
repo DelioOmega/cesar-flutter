@@ -2,15 +2,18 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../config/ruta.dart';
 
+// Cliente HTTP genérico. Todos los servicios lo usan para llamar al backend.
+// Concatena Ruta.baseUrl + path y parsea la respuesta JSON automáticamente.
 class ApiClient {
   static final http.Client _client = http.Client();
 
+  // Headers JSON por defecto.
   static Map<String, String> get _headers => {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
       };
 
-  /// GET — devuelve body decodificado o null si falla
+  // GET → devuelve el body parseado o null si falla.
   static Future<dynamic> get(String path) async {
     try {
       final uri = Uri.parse('${Ruta.baseUrl}$path');
@@ -24,7 +27,7 @@ class ApiClient {
     }
   }
 
-  /// POST — devuelve body decodificado o null si falla
+  // POST → envía body JSON, devuelve respuesta parseada o null.
   static Future<dynamic> post(String path, Map<String, dynamic> body) async {
     try {
       final uri = Uri.parse('${Ruta.baseUrl}$path');
@@ -39,7 +42,7 @@ class ApiClient {
     }
   }
 
-  /// PUT — devuelve body decodificado o null si falla
+  // PUT → envía body JSON, devuelve respuesta parseada o null.
   static Future<dynamic> put(String path, Map<String, dynamic> body) async {
     try {
       final uri = Uri.parse('${Ruta.baseUrl}$path');
@@ -54,7 +57,7 @@ class ApiClient {
     }
   }
 
-  /// DELETE — devuelve true si exitoso, false si falla
+  // DELETE → devuelve true si la respuesta fue 2xx, false si falla.
   static Future<bool> delete(String path) async {
     try {
       final uri = Uri.parse('${Ruta.baseUrl}$path');

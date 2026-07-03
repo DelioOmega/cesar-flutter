@@ -1,9 +1,10 @@
+// Modelo de Usuario. Mapea los campos del backend (usuId, usuNom, usuApe, …).
 class Usuario {
   final String id;
   final String nombre;
   final String apellido;
   final String email;
-  final String rol;
+  final String rol; // "Atelier Manager" o "Costurera"
   final String? telefono;
 
   Usuario({
@@ -17,6 +18,7 @@ class Usuario {
 
   String get nombreCompleto => '$nombre $apellido';
 
+  // Construye un Usuario desde el JSON del backend.
   factory Usuario.fromBackend(Map<String, dynamic> json) {
     final rolRaw = json["usuRol"];
     final rolStr = rolRaw == 1
@@ -35,6 +37,7 @@ class Usuario {
     );
   }
 
+  // Convierte el Usuario a JSON para enviar al backend.
   Map<String, dynamic> toJson() => {
         "usuId": id,
         "usuNom": nombre,

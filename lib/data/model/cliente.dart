@@ -1,3 +1,4 @@
+// Modelo de Cliente. Mapea los campos del backend (cliId, cliNom, cliApe, …).
 class Cliente {
   final String id;
   final String nombre;
@@ -6,7 +7,7 @@ class Cliente {
   final String? telefono2;
   final String email;
   final String? avatar;
-  final String? fechaUltimoPedido;
+  final String? fechaUltimoPedido; // cliFecReg — realmente es fecha de registro
   final String? direccion;
 
   Cliente({
@@ -23,6 +24,7 @@ class Cliente {
 
   String get nombreCompleto => "$nombre $apellido";
 
+  // Construye desde JSON local.
   factory Cliente.fromJson(Map<String, dynamic> json) {
     return Cliente(
       id: json["id"]?.toString() ?? "",
@@ -35,7 +37,7 @@ class Cliente {
     );
   }
 
-  /// Convierte desde el formato del backend (cliNom, cliApe, cliTel, cliCorr…)
+  // Construye desde el JSON del backend (cliNom, cliApe, cliTel, cliCorr…).
   factory Cliente.fromBackend(Map<String, dynamic> json) {
     return Cliente(
       id: json["cliId"]?.toString() ?? "",
@@ -49,6 +51,7 @@ class Cliente {
     );
   }
 
+  // Convierte a JSON (formato local).
   Map<String, dynamic> toJson() => {
         "id": id,
         "nombre": nombre,
@@ -61,6 +64,7 @@ class Cliente {
         "direccion": direccion,
       };
 
+  // Crea una copia con campos actualizados.
   Cliente copyWith({
     String? id,
     String? nombre,

@@ -4,9 +4,11 @@ import '../core/services/cliente_service.dart';
 import '../data/model/pedido.dart';
 import '../data/model/cliente.dart';
 
+// Controlador de pedidos. Gestiona lista, búsqueda, filtros y CRUD.
+// Hace join local con clientes para rellenar clienteNombre.
 class PedidoController extends ChangeNotifier {
-  List<Pedido> _pedidos = [];
-  List<Pedido> _pedidosFiltrados = [];
+  List<Pedido> _pedidos = [];           // lista completa
+  List<Pedido> _pedidosFiltrados = [];  // lista mostrada en UI
   bool _loading = false;
   String? _error;
   String _query = "";
@@ -20,27 +22,28 @@ class PedidoController extends ChangeNotifier {
   String get query => _query;
   EstadoPedido? get filtroEstado => _filtroEstado;
 
+  // GET /pedidos/ + GET /clientes/ → carga todo y hace join local.
   Future<void> cargarPedidos() async {
     _loading = true;
     notifyListeners();
 
     try {
-      // Cargar pedidos y clientes en paralelo para hacer join local
       final resultados = await Future.wait([
         PedidoService.getPedidos(),
         ClienteService.getClientes(),
       ]);
       final pedidosRaw = resultados[0] as List<Pedido>;
-      final clientes =
-          (resultados[1] as List).cast<Cliente>();
+      final clientes = (resultados[1] as List).cast<Cliente>();
 
-      // Join local: rellenar clienteNombre desde el id
+      // Mapa: id del cliente → nombre completo
       final mapaClientes = {
         for (final c in clientes) c.id: c.nombreCompleto,
       };
 
+      // Rellenar clienteNombre en cada pedido
       _pedidos = pedidosRaw.map((p) {
-        final nombreCliente = mapaClientes[p.clienteId] ?? "Cliente ${p.clienteId}";
+        final nombreCliente =
+            mapaClientes[p.clienteId] ?? "Cliente ${p.clienteId}";
         return Pedido(
           id: p.id,
           numeroOrden: p.numeroOrden,
@@ -66,6 +69,7 @@ class PedidoController extends ChangeNotifier {
     notifyListeners();
   }
 
+  // Busca pedidos (filtro local). Si q está vacío recarga.
   Future<void> buscar(String q) async {
     _query = q;
     _loading = true;
@@ -82,34 +86,40 @@ class PedidoController extends ChangeNotifier {
     notifyListeners();
   }
 
+  // Cambia el filtro de estado.
   void setFiltroEstado(EstadoPedido? estado) {
     _filtroEstado = estado;
     _aplicarFiltros();
     notifyListeners();
   }
 
+  // POST /pedidos → registra y recarga.
   Future<String> registrar(Map<String, dynamic> data) async {
     final resp = await PedidoService.registrar(data);
     await cargarPedidos();
     return resp;
   }
 
-  Future<String> editar(Map<String, dynamic> data) async {
-    final resp = await PedidoService.editar(data);
-    await cargarPedidos();
-    return resp;
-  }
+  // // PUT /pedidos/ — no implementado.
+  // Future<String> editar(Map<String, dynamic> data) async {
+  //   final resp = await PedidoService.editar(data);
+  //   await cargarPedidos();
+  //   return resp;
+  // }
 
+  // DELETE /pedidos/$id → elimina y recarga.
   Future<void> eliminar(String id) async {
     await PedidoService.eliminar(id);
     await cargarPedidos();
   }
 
+  // Aplica filtros de búsqueda y estado.
   void _aplicarFiltros() {
     _pedidosFiltrados = List.from(_pedidos);
     if (_filtroEstado != null) {
-      _pedidosFiltrados =
-          _pedidosFiltrados.where((p) => p.estado == _filtroEstado).toList();
+      _pedidosFiltrados = _pedidosFiltrados
+          .where((p) => p.estado == _filtroEstado)
+          .toList();
     }
   }
 }

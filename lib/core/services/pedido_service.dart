@@ -1,7 +1,9 @@
 import '../../data/model/pedido.dart';
 import 'api_client.dart';
 
+// Servicio de pedidos. CRUD contra el backend via ApiClient.
 class PedidoService {
+  // GET /pedidos/ → devuelve la lista de pedidos.
   static Future<List<Pedido>> getPedidos() async {
     final data = await ApiClient.get('/pedidos/');
     if (data == null || data is! List) return [];
@@ -10,6 +12,7 @@ class PedidoService {
         .toList();
   }
 
+  // Busca pedidos por número, cliente o descripción (filtro local).
   static Future<List<Pedido>> buscar(String query) async {
     final pedidos = await getPedidos();
     if (query.isEmpty) return pedidos;
@@ -20,14 +23,15 @@ class PedidoService {
         p.descripcionProducto.toLowerCase().contains(q)).toList();
   }
 
+  // Filtra pedidos por estado (filtro local).
   static Future<List<Pedido>> filtrarPorEstado(EstadoPedido? estado) async {
     final pedidos = await getPedidos();
     if (estado == null) return pedidos;
     return pedidos.where((p) => p.estado == estado).toList();
   }
 
+  // POST /pedidos → registra un nuevo pedido.
   static Future<String> registrar(Map<String, dynamic> data) async {
-    // Generar un id de pedido corto (máx 5 chars)
     final ts = DateTime.now().millisecondsSinceEpoch;
     final id = (ts % 99999).toString().padLeft(5, '0');
 
@@ -44,7 +48,6 @@ class PedidoService {
       if (data["observacion"] != null && data["observacion"].toString().isNotEmpty)
         "observacion": data["observacion"].toString(),
     };
-    print(body);
 
     final resp = await ApiClient.post('/pedidos', body);
     if (resp != null) {
@@ -54,11 +57,12 @@ class PedidoService {
     return "Pedido registrado correctamente";
   }
 
-  static Future<String> editar(Map<String, dynamic> data) async {
-    // El backend no tiene PUT /pedidos/
-    return "Funcionalidad no disponible en el servidor";
-  }
+  // PUT /pedidos/ — no implementado en el backend.
+  // static Future<String> editar(Map<String, dynamic> data) async {
+  //   return "Funcionalidad no disponible en el servidor";
+  // }
 
+  // DELETE /pedidos/$id → cancela/elimina un pedido.
   static Future<String> eliminar(String id) async {
     final ok = await ApiClient.delete('/pedidos/$id');
     return ok ? "Pedido cancelado" : "Error al cancelar pedido";

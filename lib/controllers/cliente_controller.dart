@@ -2,9 +2,11 @@ import 'package:flutter/foundation.dart';
 import '../core/services/cliente_service.dart';
 import '../data/model/cliente.dart';
 
+// Controlador de clientes. Gestiona lista, búsqueda y CRUD.
+// Mantiene dos listas: una completa y otra filtrada para la UI.
 class ClienteController extends ChangeNotifier {
-  List<Cliente> _clientes = [];
-  List<Cliente> _clientesFiltrados = [];
+  List<Cliente> _clientes = [];          // lista completa
+  List<Cliente> _clientesFiltrados = []; // lista mostrada en UI
   bool _loading = false;
   String? _error;
   String _query = "";
@@ -14,6 +16,7 @@ class ClienteController extends ChangeNotifier {
   String? get error => _error;
   String get query => _query;
 
+  // GET /clientes/ → carga todos los clientes.
   Future<void> cargarClientes() async {
     _loading = true;
     notifyListeners();
@@ -30,6 +33,7 @@ class ClienteController extends ChangeNotifier {
     notifyListeners();
   }
 
+  // Busca clientes por nombre (filtro local).
   Future<void> buscar(String q) async {
     _query = q;
 
@@ -48,23 +52,27 @@ class ClienteController extends ChangeNotifier {
     notifyListeners();
   }
 
+  // POST /clientes/ → registra y recarga.
   Future<String> registrar(Map<String, dynamic> data, String usuIdFk) async {
     final resp = await ClienteService.registrar(data, usuIdFk);
     await cargarClientes();
     return resp;
   }
 
+  //  PUT /clientes/ — no implementado en backend.
   Future<String> editar(Map<String, dynamic> data) async {
     final resp = await ClienteService.editar(data);
     await cargarClientes();
     return resp;
   }
 
+  //  DELETE /clientes/ — no implementado en backend.
   Future<void> eliminar(String id) async {
     await ClienteService.eliminar(id);
     await cargarClientes();
   }
 
+  // Aplica el filtro de búsqueda sobre la lista completa.
   void _aplicarFiltro() {
     if (_query.isEmpty) {
       _clientesFiltrados = List.from(_clientes);
